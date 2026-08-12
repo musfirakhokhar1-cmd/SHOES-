@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WALKIFY — Premium Vintage Shoe Store</title>
+  <meta name="description" content="Discover WALKIFY's luxury handcrafted vintage footwear collection. Walk with style and confidence.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ==========================================================================
+       1. AUTH / WELCOME OVERLAY (Front-end Auth via localStorage)
+       ========================================================================== -->
+  <div id="authOverlay" class="auth-page-wrapper">
+    <div class="auth-card">
+      <div class="auth-brand-title">WALKIFY</div>
+      <div class="auth-brand-tagline">STEP INTO YOUR STYLE.</div>
+
+      <!-- Login Form -->
+      <div id="loginFormContainer">
+        <form class="auth-form" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label for="loginEmail">Email Address</label>
+            <input type="email" id="loginEmail" class="form-control" placeholder="name@example.com" required>
+          </div>
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required>
+          </div>
+          <div class="form-options">
+            <label class="remember-me">
+              <input type="checkbox" id="loginRemember" checked>
+              <span>Remember Me</span>
+            </label>
+            <span class="auth-toggle-link" onclick="toggleAuthMode('forgot')">Forgot Password?</span>
+          </div>
+          <button type="submit" class="btn-primary" style="width: 100%; margin-top: 0.5rem;">
+            <i class="fa-solid fa-right-to-bracket"></i> Login To WALKIFY
+          </button>
+        </form>
+        <p class="auth-toggle-text">
+          New to WALKIFY? <span class="auth-toggle-link" onclick="toggleAuthMode('signup')">Create Account</span>
+        </p>
+      </div>
+
+      <!-- Sign Up Form -->
+      <div id="signupFormContainer" style="display: none;">
+        <form class="auth-form" onsubmit="handleSignUp(event)">
+          <div class="form-group">
+            <label for="signupName">Full Name</label>
+            <input type="text" id="signupName" class="form-control" placeholder="John Doe" required>
+          </div>
+          <div class="form-group">
+            <label for="signupEmail">Email Address</label>
+            <input type="email" id="signupEmail" class="form-control" placeholder="name@example.com" required>
+          </div>
+          <div class="form-group">
+            <label for="signupPassword">Password</label>
+            <input type="password" id="signupPassword" class="form-control" placeholder="••••••••" required>
+          </div>
+          <div class="form-group">
+            <label for="signupConfirmPassword">Confirm Password</label>
+            <input type="password" id="signupConfirmPassword" class="form-control" placeholder="••••••••" required>
+          </div>
+          <button type="submit" class="btn-primary" style="width: 100%; margin-top: 0.5rem;">
+            <i class="fa-solid fa-user-plus"></i> Create Account
+          </button>
+        </form>
+        <p class="auth-toggle-text">
+          Already have an account? <span class="auth-toggle-link" onclick="toggleAuthMode('login')">Login</span>
+        </p>
+      </div>
+
+      <!-- Forgot Password Form -->
+      <div id="forgotFormContainer" style="display: none;">
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+          Enter your email address and we'll send you a password reset link.
+        </p>
+        <form class="auth-form" onsubmit="handleForgotPassword(event)">
+          <div class="form-group">
+            <label for="forgotEmail">Email Address</label>
+            <input type="email" id="forgotEmail" class="form-control" placeholder="name@example.com" required>
+          </div>
+          <button type="submit" class="btn-primary" style="width: 100%; margin-top: 0.5rem;">
+            Send Reset Link
+          </button>
+        </form>
+        <p class="auth-toggle-text">
+          Back to <span class="auth-toggle-link" onclick="toggleAuthMode('login')">Login</span>
+        </p>
+      </div>
+
+      <button class="guest-skip-btn" onclick="skipAuthGuest()">
+        Explore Store as Guest <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       2. STICKY NAVIGATION BAR
+       ========================================================================== -->
+  <header class="navbar">
+    <div class="navbar-container">
+      <a href="#home" class="logo-brand">
+        <img src="images/logo.png" alt="WALKIFY Logo" onerror="this.onerror=null; this.src='images/logo.png';">
+        <span class="brand-text">WALKIFY</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#home" class="nav-link active">Home</a></li>
+        <li><a href="#shop" class="nav-link">Shop</a></li>
+        <li><a href="#new-arrivals" class="nav-link">New Arrivals</a></li>
+        <li><a href="#collections" class="nav-link">Collections</a></li>
+        <li><a href="#about" class="nav-link">About</a></li>
+        <li><a href="#contact" class="nav-link">Contact</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="#shop" class="nav-btn" title="Search Shoes">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </a>
+        <button class="nav-btn" onclick="openWishlistModal()" title="Wishlist">
+          <i class="fa-regular fa-heart"></i>
+          <span id="wishlistCounter" class="badge-counter">0</span>
+        </button>
+        <button class="nav-btn" onclick="toggleCartDrawer(true)" title="Shopping Bag">
+          <i class="fa-solid fa-bag-shopping"></i>
+          <span id="cartItemCounter" class="badge-counter">0</span>
+        </button>
+        <button class="nav-btn" onclick="document.getElementById('authOverlay').classList.remove('hidden')" title="Account / Login">
+          <span id="userGreetingNav"><i class="fa-solid fa-user"></i></span>
+        </button>
+        <button class="nav-btn" onclick="handleLogout()" title="Logout" style="color:#EF4444;">
+          <i class="fa-solid fa-power-off"></i>
+        </button>
+        <button id="hamburgerBtn" class="hamburger-btn">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Nav Drawer -->
+  <div id="mobileNavOverlay" class="mobile-nav-overlay">
+    <div class="mobile-nav-drawer">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
+        <span class="brand-text" style="font-family:var(--font-display); font-size:1.8rem; font-weight:700;">WALKIFY</span>
+        <button id="mobileNavClose" style="font-size:1.5rem; color:var(--text-cream);"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <ul style="list-style:none; display:flex; flex-direction:column; gap:1.2rem; font-size:1.1rem;">
+        <li><a href="#home" class="nav-link" onclick="document.getElementById('mobileNavOverlay').classList.remove('active')">Home</a></li>
+        <li><a href="#shop" class="nav-link" onclick="document.getElementById('mobileNavOverlay').classList.remove('active')">Shop Collection</a></li>
+        <li><a href="#new-arrivals" class="nav-link" onclick="document.getElementById('mobileNavOverlay').classList.remove('active')">New Arrivals</a></li>
+        <li><a href="#collections" class="nav-link" onclick="document.getElementById('mobileNavOverlay').classList.remove('active')">Collections</a></li>
+        <li><a href="#about" class="nav-link" onclick="document.getElementById('mobileNavOverlay').classList.remove('active')">About WALKIFY</a></li>
+        <li><a href="#contact" class="nav-link" onclick="document.getElementById('mobileNavOverlay').classList.remove('active')">Contact Us</a></li>
+      </ul>
+      <div style="margin-top:auto; padding-top:2rem; border-top:1px solid var(--border-gold-subtle);">
+        <button class="btn-primary" style="width:100%;" onclick="document.getElementById('mobileNavOverlay').classList.remove('active'); document.getElementById('authOverlay').classList.remove('hidden');">
+          <i class="fa-solid fa-user"></i> Account / Login
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       3. HERO SECTION
+       ========================================================================== -->
+  <section id="home" class="hero-section">
+    <div class="hero-container">
+      <div class="hero-content">
+        <span class="hero-eyebrow">
+          <i class="fa-solid fa-crown text-gold"></i> Premium Vintage Footwear
+        </span>
+        <h1 class="hero-title gold-gradient-text">WALKIFY</h1>
+        <p class="hero-tagline">"Walk With Style. Walk With Confidence."</p>
+        <p class="hero-description">
+          Handcrafted vintage leather footwear designed for those who believe every single step should make an unforgettable statement of luxury and individuality.
+        </p>
+        <div class="hero-buttons">
+          <a href="#shop" class="btn-primary">
+            <i class="fa-solid fa-shoe-prints"></i> EXPLORE COLLECTION
+          </a>
+          <a href="#shop" class="btn-outline">
+            <i class="fa-solid fa-store"></i> SHOP NOW
+          </a>
+        </div>
+      </div>
+
+      <div class="hero-image-wrapper">
+        <div class="hero-image-frame">
+          <img src="images/hero-shoe.jpg" alt="WALKIFY Hero Vintage Shoe" onerror="this.onerror=null; this.src='images/hero-shoe.jpg';">
+          <div class="hero-floating-badge">
+            <div class="hero-badge-icon"><i class="fa-solid fa-award"></i></div>
+            <div class="hero-badge-text">
+              <strong>100% Genuine Leather</strong>
+              Handcrafted Craftsmanship
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       4. SPECIAL OFFER BANNER
+       ========================================================================== -->
+  <section class="special-offer-section">
+    <div class="offer-card">
+      <div class="offer-content">
+        <h3>LIMITED TIME SPECIAL OFFER</h3>
+        <h2>STEP INTO SOMETHING NEW</h2>
+        <p style="color: var(--text-muted); margin-bottom: 1rem;">
+          Premium WALKIFY footwear — handcrafted for maximum luxury and long-lasting comfort.
+        </p>
+        <div class="offer-pricing">
+          <span class="offer-price-current">Rs. 2,200</span>
+          <span class="offer-price-original">Rs. 2,500</span>
+          <span class="offer-delivery"><i class="fa-solid fa-truck-fast"></i> Delivery only Rs. 250</span>
+        </div>
+        <a href="#shop" class="btn-primary">
+          <i class="fa-solid fa-bag-shopping"></i> SHOP NOW
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       5. NEW ARRIVALS SECTION
+       ========================================================================== -->
+  <section id="new-arrivals" style="padding: 5rem 2rem; max-width: 1300px; margin: 0 auto;">
+    <div class="section-header">
+      <span class="sub-heading">Fresh Releases</span>
+      <h2>NEW ARRIVALS</h2>
+      <p>Discover our latest vintage additions featuring signature stitching and luxury leather finishes.</p>
+    </div>
+    <div id="newArrivalsGrid" class="products-grid">
+      <!-- Dynamically Rendered by JS -->
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       6. COLLECTIONS / CATEGORIES
+       ========================================================================== -->
+  <section id="collections" class="collections-section">
+    <div class="section-header">
+      <span class="sub-heading">Curated Footwear</span>
+      <h2>EXPLORE COLLECTIONS</h2>
+      <p>Select your preferred archetype to filter our master footwear collection.</p>
+    </div>
+
+    <div class="collections-grid">
+      <div class="category-card" onclick="filterCategory('Casual')">
+        <img src="images/shoe5.jpg" alt="Casual Collection" onerror="this.onerror=null; this.src='images/shoe5.jpg';">
+        <div class="category-overlay">
+          <div class="category-title">CASUAL</div>
+          <div class="category-description">Comfortable everyday shoes.</div>
+        </div>
+      </div>
+
+      <div class="category-card" onclick="filterCategory('Sneakers')">
+        <img src="images/shoe3.jpg" alt="Sneakers Collection" onerror="this.onerror=null; this.src='images/shoe3.jpg';">
+        <div class="category-overlay">
+          <div class="category-title">SNEAKERS</div>
+          <div class="category-description">Modern street-style footwear.</div>
+        </div>
+      </div>
+
+      <div class="category-card" onclick="filterCategory('Formal')">
+        <img src="images/shoe1.jpg" alt="Formal Collection" onerror="this.onerror=null; this.src='images/shoe1.jpg';">
+        <div class="category-overlay">
+          <div class="category-title">FORMAL</div>
+          <div class="category-description">Elegant footwear for formal occasions.</div>
+        </div>
+      </div>
+
+      <div class="category-card" onclick="filterCategory('Streetwear')">
+        <img src="images/shoe6.jpg" alt="Streetwear Collection" onerror="this.onerror=null; this.src='images/shoe6.jpg';">
+        <div class="category-overlay">
+          <div class="category-title">STREETWEAR</div>
+          <div class="category-description">Bold and modern designs.</div>
+        </div>
+      </div>
+
+      <div class="category-card" onclick="filterCategory('Premium')">
+        <img src="images/shoe7.jpg" alt="Premium Collection" onerror="this.onerror=null; this.src='images/shoe7.jpg';">
+        <div class="category-overlay">
+          <div class="category-title">PREMIUM</div>
+          <div class="category-description">Special WALKIFY collection.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       7. SHOE COLLECTION (SHOP SECTION) WITH SEARCH, FILTER & SORT
+       ========================================================================== -->
+  <section id="shop" class="shop-section">
+    <div class="section-header">
+      <span class="sub-heading">The Full Catalog</span>
+      <h2>WALKIFY SHOE COLLECTION</h2>
+      <p>Explore handcrafted footwear engineered with maximum luxury, ergonomic support, and timeless style.</p>
+    </div>
+
+    <!-- Controls Bar -->
+    <div class="shop-controls">
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text" id="shopSearchInput" placeholder="Search shoes by name or category (e.g., Sneakers, Oxford)...">
+      </div>
+
+      <div class="filter-tabs">
+        <button class="filter-btn active" data-category="All" onclick="filterCategory('All')">All</button>
+        <button class="filter-btn" data-category="Casual" onclick="filterCategory('Casual')">Casual</button>
+        <button class="filter-btn" data-category="Sneakers" onclick="filterCategory('Sneakers')">Sneakers</button>
+        <button class="filter-btn" data-category="Formal" onclick="filterCategory('Formal')">Formal</button>
+        <button class="filter-btn" data-category="Streetwear" onclick="filterCategory('Streetwear')">Streetwear</button>
+        <button class="filter-btn" data-category="Premium" onclick="filterCategory('Premium')">Premium</button>
+      </div>
+
+      <div class="sort-box">
+        <select id="shopSortSelect">
+          <option value="popular">Sort: Popularity</option>
+          <option value="price-low">Price: Low to High</option>
+          <option value="price-high">Price: High to Low</option>
+          <option value="newest">Newest Arrivals</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Products Grid -->
+    <div id="productsGrid" class="products-grid">
+      <!-- Rendered dynamically by script.js -->
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       8. WHY WALKIFY? SECTION
+       ========================================================================== -->
+  <section class="features-section">
+    <div class="section-header">
+      <span class="sub-heading">Brand Promise</span>
+      <h2>WHY CHOOSE WALKIFY?</h2>
+      <p>We combine traditional cobbler craftsmanship with modern ergonomic performance.</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-gem"></i></div>
+        <h3>PREMIUM QUALITY</h3>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem;">
+          Carefully selected top-grain leather and quality-focused structural designs.
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-feather"></i></div>
+        <h3>COMFORT</h3>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem;">
+          Padded memory cushioning designed for comfortable everyday movement.
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-hat-cowboy-side"></i></div>
+        <h3>VINTAGE STYLE</h3>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem;">
+          Classic heritage style seamlessly combined with modern street footwear aesthetics.
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-truck-ramp-box"></i></div>
+        <h3>EASY DELIVERY</h3>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem;">
+          Simple doorstep ordering with Cash on Delivery across Pakistan for only Rs. 250.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       9. CUSTOMER REVIEWS
+       ========================================================================== -->
+  <section class="reviews-section">
+    <div class="section-header">
+      <span class="sub-heading">Verified Testimonials</span>
+      <h2>CUSTOMER REVIEWS</h2>
+      <p>Read what our distinguished patrons say about their WALKIFY footwear experience.</p>
+    </div>
+
+    <div class="reviews-grid">
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"The design and comfort are amazing. Fits perfectly and looks super premium!"</p>
+        <div class="review-author">— WALKIFY Customer, Lahore</div>
+      </div>
+
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Premium look at an affordable price. The leather texture and brass accents are top notch."</p>
+        <div class="review-author">— WALKIFY Customer, Karachi</div>
+      </div>
+
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Cash on Delivery was seamless. Arrived in 2 days and the size 42 fit like a glove!"</p>
+        <div class="review-author">— WALKIFY Customer, Islamabad</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       10. ABOUT WALKIFY SECTION
+       ========================================================================== -->
+  <section id="about" class="about-section">
+    <div class="about-grid">
+      <div class="about-image">
+        <img src="images/hero-shoe.jpg" alt="The WALKIFY Heritage" onerror="this.onerror=null; this.src='images/hero-shoe.jpg';">
+      </div>
+      <div>
+        <span class="sub-heading">Our Heritage</span>
+        <h2 style="font-size: 2.8rem; margin-bottom: 1rem;">THE WALKIFY STORY</h2>
+        <p style="color: var(--text-muted); line-height: 1.8; margin-bottom: 1rem;">
+          WALKIFY was born out of a passion for timeless vintage elegance and uncompromising footwear quality. We believe every step should express confidence, character, and individual distinction.
+        </p>
+        <p style="color: var(--text-muted); line-height: 1.8;">
+          Our master artisans combine traditional leather crafting techniques with contemporary ergonomic insoles, ensuring your shoes look immaculate whether you're stepping into an executive board meeting or strolling through weekend avenues.
+        </p>
+        
+        <div class="values-list">
+          <div class="value-item"><i class="fa-solid fa-check"></i> Style & Distinction</div>
+          <div class="value-item"><i class="fa-solid fa-check"></i> Plush Cushion Comfort</div>
+          <div class="value-item"><i class="fa-solid fa-check"></i> Genuine Leather Quality</div>
+          <div class="value-item"><i class="fa-solid fa-check"></i> Bold Individuality</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       11. CONTACT SECTION
+       ========================================================================== -->
+  <section id="contact" class="contact-section">
+    <div class="contact-card">
+      <div class="section-header" style="margin-bottom: 2rem;">
+        <span class="sub-heading">Get In Touch</span>
+        <h2>CONTACT WALKIFY</h2>
+        <p>Have questions about sizes, custom orders, or delivery? Send us a message.</p>
+      </div>
+
+      <form id="contactForm" style="display: flex; flex-direction: column; gap: 1.2rem;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label for="contactName">Full Name</label>
+            <input type="text" id="contactName" class="form-control" placeholder="John Doe" required>
+          </div>
+          <div class="form-group">
+            <label for="contactEmail">Email Address</label>
+            <input type="email" id="contactEmail" class="form-control" placeholder="name@example.com" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="contactMessage">Your Message</label>
+          <textarea id="contactMessage" class="form-control" rows="4" placeholder="How can we assist you today?" required></textarea>
+        </div>
+        <button type="submit" class="btn-primary" style="align-self: flex-start;">
+          <i class="fa-solid fa-paper-plane"></i> Send Message
+        </button>
+      </form>
+
+      <div style="margin-top: 3rem; text-align: center; border-top: 1px solid var(--border-gold-subtle); padding-top: 2rem;">
+        <div style="font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; color: var(--accent-gold-bright);">WALKIFY</div>
+        <p style="font-style: italic; color: var(--text-beige); margin-top: 0.3rem;">Walk With Style. Walk With Confidence.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       12. FOOTER
+       ========================================================================== -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div>
+        <div class="logo-brand" style="margin-bottom: 1rem;">
+          <img src="images/logo.png" alt="WALKIFY Logo" style="width:36px; height:36px; border-radius:50%; border:1px solid var(--accent-gold);">
+          <span class="brand-text">WALKIFY</span>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">
+          Every step tells a story. Premium dark vintage luxury footwear for the modern connoisseur.
+        </p>
+        <div class="social-links">
+          <a href="#" class="social-icon" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" class="social-icon" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+          <a href="#" class="social-icon" title="Pinterest"><i class="fa-brands fa-pinterest"></i></a>
+          <a href="#" class="social-icon" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>QUICK LINKS</h4>
+        <ul>
+          <li><a href="#home">Home</a></li>
+          <li><a href="#shop">Shop Catalog</a></li>
+          <li><a href="#new-arrivals">New Arrivals</a></li>
+          <li><a href="#collections">Collections</a></li>
+          <li><a href="#about">About Story</a></li>
+          <li><a href="#contact">Contact Us</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>CUSTOMER CARE</h4>
+        <ul>
+          <li><a href="#">Shipping & Delivery</a></li>
+          <li><a href="#">Returns & Exchanges</a></li>
+          <li><a href="#">Size Guide (39-44)</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms & Conditions</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>CONTACT INFO</h4>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem;">
+          <i class="fa-solid fa-envelope text-gold"></i> walkify@example.com
+        </p>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem;">
+          <i class="fa-solid fa-phone text-gold"></i> +92 XXX XXXXXXX
+        </p>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">
+          <i class="fa-solid fa-location-dot text-gold"></i> Lahore, Pakistan
+        </p>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      © 2026 WALKIFY. All rights reserved. Premium Vintage Footwear Brand.
+    </div>
+  </footer>
+
+  <!-- ==========================================================================
+       13. PRODUCT DETAILS MODAL (WITH SIZE SELECTION GUARD)
+       ========================================================================== -->
+  <div id="productDetailModal" class="modal-overlay">
+    <div class="modal-container">
+      <button class="modal-close-btn" onclick="closeProductDetail()">&times;</button>
+      <div class="product-detail-layout">
+        <div class="product-detail-gallery">
+          <img id="detailImg" src="" alt="Product Detail Image">
+        </div>
+
+        <div class="product-detail-info">
+          <div id="detailCategory" class="product-category"></div>
+          <h2 id="detailTitle" style="font-size: 2rem; margin-bottom: 0.5rem;"></h2>
+          
+          <div style="color: var(--accent-gold-bright); margin-bottom: 1rem; font-size: 0.9rem;">
+            ★★★★★ <span style="color: var(--text-muted); font-size: 0.8rem;">(4.9 / 5 Rating)</span>
+          </div>
+
+          <div class="product-pricing" style="margin-bottom: 1.5rem;">
+            <span id="detailSalePrice" class="price-sale" style="font-size: 1.8rem;"></span>
+            <span id="detailOriginalPrice" class="price-original" style="font-size: 1.1rem;"></span>
+            <span id="detailDiscountBadge" class="discount-tag">12% OFF</span>
+          </div>
+
+          <p id="detailDescription" style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1.5rem;"></p>
+
+          <!-- Size Selector -->
+          <div class="size-selector">
+            <div class="size-title">
+              <span>AVAILABLE SIZES (MUST SELECT ONE)</span>
+              <span style="color: var(--accent-gold); cursor: pointer;" onclick="showToast('Sizes available: EU 39 to 44. Standard UK fit.')">Size Chart</span>
+            </div>
+            <div id="detailSizeOptions" class="size-options">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- Quantity Selector -->
+          <div class="quantity-control">
+            <span style="font-size: 0.8rem; letter-spacing: 0.1em; color: var(--text-beige); font-weight: 600;">QUANTITY:</span>
+            <button class="qty-btn" onclick="adjustDetailQty(-1)">-</button>
+            <input type="text" id="detailQtyInput" class="qty-input" value="1" readonly>
+            <button class="qty-btn" onclick="adjustDetailQty(1)">+</button>
+          </div>
+
+          <!-- Action Buttons -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+            <button class="btn-outline" onclick="addDetailToCart(false)">
+              <i class="fa-solid fa-cart-plus"></i> ADD TO CART
+            </button>
+            <button class="btn-primary" onclick="addDetailToCart(true)">
+              <i class="fa-solid fa-bolt"></i> BUY NOW
+            </button>
+          </div>
+
+          <!-- Highlights -->
+          <div class="detail-features">
+            <h4>PRODUCT HIGHLIGHTS</h4>
+            <ul>
+              <li>Premium quality leather</li>
+              <li>Comfortable ergonomic design</li>
+              <li>Stylish vintage finish</li>
+              <li>Suitable for everyday wear</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       14. SHOPPING CART DRAWER
+       ========================================================================== -->
+  <div id="cartDrawerOverlay" class="cart-drawer-overlay">
+    <div class="cart-drawer">
+      <div class="cart-header">
+        <div class="cart-title">
+          <i class="fa-solid fa-bag-shopping text-gold"></i> SHOPPING BAG
+        </div>
+        <button onclick="toggleCartDrawer(false)" style="font-size: 1.5rem; color: var(--text-cream);">&times;</button>
+      </div>
+
+      <div id="cartItemsList" class="cart-body">
+        <!-- Rendered by JS -->
+      </div>
+
+      <div class="cart-footer">
+        <div class="cart-summary-line">
+          <span>Subtotal</span>
+          <span id="cartSubtotal">Rs. 0</span>
+        </div>
+        <div class="cart-summary-line">
+          <span>Delivery Charges</span>
+          <span>Rs. 250</span>
+        </div>
+        <div class="cart-summary-line total">
+          <span>Total</span>
+          <span id="cartTotal" class="text-gold">Rs. 0</span>
+        </div>
+
+        <button class="btn-primary" style="width: 100%; margin-top: 1.2rem;" onclick="openCheckoutModal()">
+          <i class="fa-solid fa-lock"></i> PROCEED TO CHECKOUT
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       15. CHECKOUT MODAL
+       ========================================================================== -->
+  <div id="checkoutModal" class="modal-overlay checkout-modal">
+    <div class="modal-container">
+      <button class="modal-close-btn" onclick="closeModal('checkoutModal')">&times;</button>
+      <div class="checkout-grid">
+        
+        <!-- Form -->
+        <div>
+          <h2 style="font-size: 1.8rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-gold-subtle); padding-bottom: 0.5rem;">
+            CUSTOMER & SHIPPING DETAILS
+          </h2>
+          <form id="checkoutForm" onsubmit="processCheckoutOrder(event)">
+            <div class="form-group" style="margin-bottom: 1rem;">
+              <label for="checkoutName">Full Name *</label>
+              <input type="text" id="checkoutName" class="form-control" placeholder="Muhammad Ali" required>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+              <div class="form-group">
+                <label for="checkoutEmail">Email Address *</label>
+                <input type="email" id="checkoutEmail" class="form-control" placeholder="ali@example.com" required>
+              </div>
+              <div class="form-group">
+                <label for="checkoutPhone">Phone Number *</label>
+                <input type="tel" id="checkoutPhone" class="form-control" placeholder="0300 1234567" required>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 1rem;">
+              <label for="checkoutAddress">Complete Address *</label>
+              <input type="text" id="checkoutAddress" class="form-control" placeholder="House #, Street, Sector / Area" required>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.8rem; margin-bottom: 1.5rem;">
+              <div class="form-group">
+                <label for="checkoutCity">City *</label>
+                <input type="text" id="checkoutCity" class="form-control" placeholder="Lahore" required>
+              </div>
+              <div class="form-group">
+                <label for="checkoutProvince">Province *</label>
+                <input type="text" id="checkoutProvince" class="form-control" placeholder="Punjab" required>
+              </div>
+              <div class="form-group">
+                <label for="checkoutPostal">Postal Code</label>
+                <input type="text" id="checkoutPostal" class="form-control" placeholder="54000">
+              </div>
+            </div>
+
+            <!-- Payment Method Box -->
+            <div class="payment-method-box">
+              <div class="payment-badge-icon"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+              <div>
+                <strong style="color: var(--accent-gold-bright); display: block;">CASH ON DELIVERY</strong>
+                <span style="font-size: 0.8rem; color: var(--text-muted);">
+                  Pay cash upon receiving your WALKIFY order package at your doorstep.
+                </span>
+              </div>
+            </div>
+
+            <button type="submit" class="btn-primary" style="width: 100%; margin-top: 1.5rem;">
+              <i class="fa-solid fa-check-circle"></i> PLACE ORDER NOW
+            </button>
+          </form>
+        </div>
+
+        <!-- Summary -->
+        <div class="order-summary-box">
+          <h3 style="font-size: 1.3rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-gold-subtle); padding-bottom: 0.5rem;">
+            ORDER SUMMARY
+          </h3>
+          <div id="checkoutOrderSummaryList">
+            <!-- Rendered by JS -->
+          </div>
+          <div style="border-top: 1px solid var(--border-gold-subtle); padding-top: 1rem; margin-top: 1rem;">
+            <div class="cart-summary-line">
+              <span>Subtotal</span>
+              <span id="checkoutSubtotal">Rs. 0</span>
+            </div>
+            <div class="cart-summary-line">
+              <span>Delivery Charges</span>
+              <span id="checkoutDelivery">Rs. 250</span>
+            </div>
+            <div class="cart-summary-line total">
+              <span>Final Total</span>
+              <span id="checkoutTotal" class="text-gold">Rs. 0</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       16. ORDER CONFIRMATION SCREEN
+       ========================================================================== -->
+  <div id="orderConfirmationModal" class="modal-overlay">
+    <div class="modal-container" style="max-width: 650px;">
+      <div class="confirmation-card">
+        <div class="confirmation-icon"><i class="fa-solid fa-circle-check"></i></div>
+        <h2 style="font-size: 2.2rem; color: var(--accent-gold-bright); margin-bottom: 0.5rem;">ORDER CONFIRMED!</h2>
+        <p style="font-family: var(--font-display); font-size: 1.2rem; font-style: italic; color: var(--text-beige);">
+          Thank you for choosing WALKIFY.
+        </p>
+
+        <div class="order-details-box">
+          <div class="order-detail-row">
+            <span>Order Number:</span>
+            <strong id="confirmOrderNum" class="text-gold">#WK-2026-48291</strong>
+          </div>
+          <div class="order-detail-row">
+            <span>Customer Name:</span>
+            <span id="confirmCustomerName"></span>
+          </div>
+          <div class="order-detail-row">
+            <span>Payment Method:</span>
+            <strong style="color:var(--accent-gold);">Cash on Delivery</strong>
+          </div>
+          <div class="order-detail-row">
+            <span>Delivery Address:</span>
+            <span id="confirmDeliveryAddress" style="max-width: 300px; text-align: right;"></span>
+          </div>
+          <div class="order-detail-row" style="font-size: 1.1rem; font-weight: 700; color: var(--text-cream); border-top: 1px solid var(--border-gold-subtle); margin-top: 0.5rem; padding-top: 0.8rem;">
+            <span>Order Total:</span>
+            <span id="confirmTotalAmount" class="text-gold">Rs. 2,450</span>
+          </div>
+        </div>
+
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+          Your order is being prepared for dispatch. Estimated delivery is within 3-5 business days across Pakistan.
+        </p>
+
+        <button class="btn-primary" onclick="closeModal('orderConfirmationModal'); window.location.href='#shop';">
+          <i class="fa-solid fa-arrow-left"></i> CONTINUE SHOPPING
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       17. WISHLIST MODAL
+       ========================================================================== -->
+  <div id="wishlistModal" class="modal-overlay">
+    <div class="modal-container" style="max-width: 800px;">
+      <button class="modal-close-btn" onclick="closeModal('wishlistModal')">&times;</button>
+      <div style="padding: 2rem;">
+        <h2 style="font-size: 1.8rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fa-solid fa-heart text-gold"></i> YOUR SAVED WISHLIST
+        </h2>
+        <div id="wishlistModalGrid" class="products-grid">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       18. TOAST NOTIFICATION ALERT
+       ========================================================================== -->
+  <div id="toastAlert" class="toast-alert">
+    <i class="fa-solid fa-bell text-gold"></i>
+    <span id="toastMessage">Notification message</span>
+  </div>
+
+  <!-- Main JavaScript File -->
+  <script src="script.js"></script>
+</body>
+</html>

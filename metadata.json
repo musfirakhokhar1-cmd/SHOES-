@@ -1,0 +1,6 @@
+{
+  "name": "WALKIFY - Premium Vintage Shoe Store",
+  "description": "A dark vintage luxury shoe store application with complete shopping journey, search, filters, size selection, cart, checkout, and order confirmation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
